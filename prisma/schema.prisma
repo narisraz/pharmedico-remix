@@ -9,3 +9,101 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+// --------------------------------------
+
+model User {
+  id             Int         @id @default(autoincrement())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  name           String?
+  email          String      @unique
+  hashedPassword String?
+  role           String      @default("USER")
+  visitor        Visitor?
+  doctor         Doctor?
+  pharmacy       Pharmacy?
+  laboratory     Laboratory?
+
+  tokens   Token[]
+  sessions Session[]
+}
+
+model Session {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  expiresAt          DateTime?
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+}
+
+model Token {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  hashedToken String
+  type        String
+  // See note below about TokenType enum
+  // type        TokenType
+  expiresAt   DateTime
+  sentTo      String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@unique([hashedToken, type])
+}
+
+model Visitor {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  firstName String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+}
+
+model Doctor {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  name            String
+  firstName       String
+  address         String
+  specialities    String
+  homeTel         String
+  officeTel       String
+  professionalTel String
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int      @unique
+}
+
+model Pharmacy {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  address   String
+  tel       String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+}
+
+model Laboratory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  address   String
+  tel       String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+}
