@@ -1,14 +1,8 @@
-import { forwardRef, PropsWithoutRef, useState } from "react"
-import { useFormikContext } from "formik"
-import {
-  IconButton,
-  InputAdornment,
-  InputBaseProps,
-  StandardTextFieldProps,
-  TextField,
-} from "@mui/material"
+import {forwardRef, PropsWithoutRef, useState} from "react"
+import {IconButton, InputAdornment, InputBaseProps, StandardTextFieldProps, TextField,} from "@mui/material"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
+import {useField, useIsSubmitting} from "remix-validated-form";
 
 export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   /** Field name. */
@@ -25,20 +19,17 @@ export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElem
 
 export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldProps>(
   ({ name, label, outerProps, type, variant, fullWidth, margin }, ref) => {
-    const { isSubmitting, values, handleChange, errors, touched } = useFormikContext<any>()
+    const { error, getInputProps } = useField(name);
     const [inputType, setInputType] = useState(type)
+    const isSubmitting = useIsSubmitting();
 
     return (
       <div {...outerProps}>
         <TextField
           label={label}
-          name={name}
           type={inputType}
-          value={values[name]}
-          disabled={isSubmitting}
-          onChange={handleChange}
-          error={touched[name] && Boolean(errors[name])}
-          helperText={touched[name] && errors[name]}
+          error={error != undefined}
+          helperText={error}
           variant={variant ?? "standard"}
           fullWidth={fullWidth ?? true}
           margin={margin ?? "dense"}
@@ -59,6 +50,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
                 }
               : {}
           }
+          {...getInputProps({ id: name })}
         />
       </div>
     )

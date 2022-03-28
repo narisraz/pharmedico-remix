@@ -1,31 +1,93 @@
-import {Form, useActionData} from "@remix-run/react";
-import {ActionFunction, LoaderFunction} from "remix";
-import {authenticator} from "~/services/auth.server";
+import {useActionData, useLoaderData} from "@remix-run/react";
+import authenticator from "~/services/auth.server";
 import LabeledTextField from "~/core/components/LabeledTextField";
-import { Formik } from 'formik';
-import {Button} from "@mui/material";
+import {SubmitButton} from "~/core/components/SubmitButton";
+import {withZod} from "@remix-validated-form/with-zod";
+import {z} from "zod";
+import {ValidatedForm, validationError} from "remix-validated-form";
+import {getSession} from "~/services/session.server";
+import {ActionFunction, json, LoaderFunction} from "remix";
+import {Alert, Box, Typography} from "@mui/material";
+import LockOpenIcon from "@mui/icons-material/LockOpen"
 
 export default function Login() {
+  const { error } = useLoaderData();
   const action = useActionData()
   console.log(JSON.stringify(action))
+
   return (
-    <Form method="post" action={"/login"}>
-      <LabeledTextField name="email" label="Email" placeholder="Email" />
-      <LabeledTextField name="password" label="Password" placeholder="Password" type="password" />
-      <Button type={"submit"}>Se connecter</Button>
-    </Form>
+    <Box
+      sx={{
+        padding: "1em",
+        maxWidth: "400px",
+        textAlign: "center",
+        alignItems: "center",
+        margin: "auto",
+        marginTop: "25px",
+      }}
+    >
+      <LockOpenIcon
+        sx={{
+          fontSize: 100,
+        }}
+      />
+      <Typography
+        variant="h6"
+        sx={{
+          marginBottom: "1em",
+        }}
+      >
+        LOGIN
+      </Typography>
+
+      {error != undefined
+        ? <Alert severity={"error"}>Email ou mot de passe incorrect</Alert>
+        : <></>
+      }
+
+      <ValidatedForm
+        method={"post"}
+        validator={validator}
+      >
+        <LabeledTextField name="email" label="Email" placeholder="Email" />
+        <LabeledTextField name="password" label="Password" placeholder="Password" type="password" />
+        <Box
+          sx={{
+            marginTop: "1em",
+          }}
+        >
+          <SubmitButton>Se connecter</SubmitButton>
+        </Box>
+      </ValidatedForm>
+    </Box>
   );
 }
 
-export let action: ActionFunction = async ({ request }) => {
-  return await authenticator.authenticate("user-pass", request, {
+export const validator = withZod(
+  z.object({
+    email: z
+      .string()
+      .email("Email invalide"),
+    password: z
+      .string()
+  })
+);
+
+export const action: ActionFunction = async ({ request }) => {
+  const fieldValues = await validator.validate(await request.formData());
+  if (fieldValues.error) return validationError(fieldValues.error);
+  await authenticator.authenticate("form", request, {
     successRedirect: "/",
     failureRedirect: "/login",
   });
 };
 
-export let loader: LoaderFunction = async ({ request }) => {
-  return await authenticator.isAuthenticated(request, {
+export const loader: LoaderFunction = async ({ request }) => {
+  await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
+
+  let session = await getSession(request.headers.get("cookie"));
+  let error = session.get(authenticator.sessionErrorKey);
+  return json({ error });
 };

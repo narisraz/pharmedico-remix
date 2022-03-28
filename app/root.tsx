@@ -56,7 +56,7 @@ const Document = withEmotionCache(({ children, title }: DocumentProps, emotionCa
     {children}
     <ScrollRestoration />
     <Scripts />
-    <LiveReload />
+    {process.env.NODE_ENV === 'development' && <LiveReload />}
     </body>
     </html>
   );
@@ -77,8 +77,6 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
-
   return (
     <Document title="Error!">
       <div>

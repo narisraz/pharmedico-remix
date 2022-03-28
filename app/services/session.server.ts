@@ -1,5 +1,15 @@
 import { createCookieSessionStorage } from "remix";
 
+
+export class User {
+  constructor(
+    readonly id: number,
+    readonly email: string,
+    readonly role: string
+  ) {
+  }
+}
+
 // export the whole sessionStorage object
 export let sessionStorage = createCookieSessionStorage({
   cookie: {

@@ -20,6 +20,7 @@
     "@prisma/client": "^3.11.1",
     "@remix-run/react": "*",
     "@remix-run/serve": "*",
+    "@remix-validated-form/with-zod": "^2.0.1",
     "@types/bcrypt": "^5.0.0",
     "bcrypt": "^5.0.1",
     "formik": "^2.2.9",
@@ -29,7 +30,9 @@
     "remix": "*",
     "remix-auth": "^3.2.1",
     "remix-auth-form": "^1.1.1",
-    "remix-validated-form": "^4.1.8"
+    "remix-validated-form": "^4.1.8",
+    "zod": "^3.14.3",
+    "zod-form-data": "^1.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "*",
