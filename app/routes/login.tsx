@@ -1,4 +1,4 @@
-import {useActionData, useLoaderData} from "@remix-run/react";
+import {Link, useActionData, useLoaderData} from "@remix-run/react";
 import authenticator from "~/services/auth.server";
 import LabeledTextField from "~/core/components/LabeledTextField";
 import {SubmitButton} from "~/core/components/SubmitButton";
@@ -7,7 +7,7 @@ import {z} from "zod";
 import {ValidatedForm, validationError} from "remix-validated-form";
 import {getSession} from "~/services/session.server";
 import {ActionFunction, json, LoaderFunction} from "remix";
-import {Alert, Box, Typography} from "@mui/material";
+import {Alert, Box, Button, Typography} from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen"
 
 export default function Login() {
@@ -51,6 +51,18 @@ export default function Login() {
       >
         <LabeledTextField name="email" label="Email" placeholder="Email" />
         <LabeledTextField name="password" label="Password" placeholder="Password" type="password" />
+
+        <Box
+          sx={{
+            textAlign: "right",
+            marginBottom: "1em",
+          }}
+        >
+          <Link to={"/forgot-password"}>
+            <a>Mot de passe oublié ?</a>
+          </Link>
+        </Box>
+
         <Box
           sx={{
             marginTop: "1em",
@@ -59,6 +71,16 @@ export default function Login() {
           <SubmitButton>Se connecter</SubmitButton>
         </Box>
       </ValidatedForm>
+
+      <Box
+        sx={{
+          marginTop: "1em",
+        }}
+      >
+        <Button href={"/signup-chooser"} type="submit" variant="outlined" fullWidth>
+          Créer un compte
+        </Button>
+      </Box>
     </Box>
   );
 }

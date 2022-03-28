@@ -4,10 +4,11 @@ import {useFormContext, useIsSubmitting} from "remix-validated-form";
 
 
 interface SubmitButtonProps {
-  children: React.ReactNode
+  children: React.ReactNode,
+  fullWidth?: boolean
 }
 
-export const SubmitButton = ({ children }: SubmitButtonProps) => {
+export const SubmitButton = ({ children, fullWidth }: SubmitButtonProps) => {
   const isSubmitting = useIsSubmitting();
   const { isValid } = useFormContext();
   const disabled = isSubmitting || !isValid;
@@ -17,6 +18,7 @@ export const SubmitButton = ({ children }: SubmitButtonProps) => {
       type={"submit"}
       variant={"contained"}
       disabled={disabled}
+      fullWidth={fullWidth ?? true}
     >
       {children}
     </Button>
